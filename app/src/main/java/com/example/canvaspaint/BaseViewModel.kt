@@ -3,7 +3,6 @@ package com.example.canvaspaint
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-
 abstract class BaseViewModel<VIEW_STATE> : ViewModel() {
 
     val viewState: MutableLiveData<VIEW_STATE> by lazy { MutableLiveData(initialViewState()) }
@@ -20,11 +19,10 @@ abstract class BaseViewModel<VIEW_STATE> : ViewModel() {
         updateState(event)
     }
 
-    private fun updateState(event: Event)  {
+    private fun updateState(event: Event) {
         val newViewState = reduce(event, viewState.value ?: initialViewState())
         if (newViewState != null && newViewState != viewState.value) {
             viewState.value = newViewState
         }
     }
-
 }

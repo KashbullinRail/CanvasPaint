@@ -29,41 +29,43 @@ class DrawView @JvmOverloads constructor(
 
     private var currentX = 0f
     private var currentY = 0f
-    private var touchToTolerance = ViewConfiguration.get(context).scaledTouchSlop
+    private val touchTolerance = ViewConfiguration.get(context).scaledTouchSlop
 
-    private val drawing = Path()
-    private val curPath = Path()
+    // Path representing
+    private val drawing = Path() // the drawing
+    private val curPath = Path() // what's currently being drawn
 
     private var onClick: () -> Unit = {}
 
-    //Settings
+    // Painting Settings
     private val paint = Paint().apply {
         color = drawColor
-        isAntiAlias = true
-        isDither = true
-        style = Paint.Style.STROKE
-        strokeJoin = Paint.Join.ROUND
-        strokeCap = Paint.Cap.ROUND
-        strokeWidth = STROKE_WIDTH
+        isAntiAlias = true // Smooths out edges of what is drawn without affecting shape.
+        isDither =
+            true // Dithering affects how colors with higher-precision than the device are down-sampled.
+        style = Paint.Style.STROKE // default: FILL
+        strokeJoin = Paint.Join.ROUND // default: MITER
+        strokeCap = Paint.Cap.ROUND // default: BUTT
+        strokeWidth = STROKE_WIDTH // default: Hairline-width (really thin)
     }
 
-//    fun render(state: CanvasViewState) {
-//        drawColor = ResourcesCompat.getColor(resources, state.color.value, null)
-//        paint.color = drawColor
-//        paint.strokeWidth = state.size.value.toFloat()
-//        if (state.tools == TOOLS.DASH) {
-//            paint.pathEffect = DashPathEffect(
-//                floatArrayOf(
-//                    state.size.value.toFloat()  * 2,
-//                    state.size.value.toFloat() * 2,
-//                    state.size.value.toFloat() * 2,
-//                    state.size.value.toFloat() * 2
-//                ), 0f
-//            )
-//        } else {
-//            paint.pathEffect = null
-//        }
-//    }
+    fun render(state: CanvasViewState) {
+        drawColor = ResourcesCompat.getColor(resources, state.color.value, null)
+        paint.color = drawColor
+        paint.strokeWidth = state.size.value.toFloat()
+        if (state.tools == TOOLS.DASH) {
+            paint.pathEffect = DashPathEffect(
+                floatArrayOf(
+                    state.size.value.toFloat() * 2,
+                    state.size.value.toFloat() * 2,
+                    state.size.value.toFloat() * 2,
+                    state.size.value.toFloat() * 2
+                ), 0f
+            )
+        } else {
+            paint.pathEffect = null
+        }
+    }
 
     fun clear() {
         extraCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
@@ -101,12 +103,12 @@ class DrawView @JvmOverloads constructor(
     private fun touchMove() {
         val dx = abs(motionTouchEventX - currentX)
         val dy = abs(motionTouchEventY - currentY)
-        if (dx >= touchToTolerance || dy >= touchToTolerance) {
+        if (dx >= touchTolerance || dy >= touchTolerance) {
             path.quadTo(
                 currentX,
                 currentY,
-                (motionTouchEventX - currentX) / 2,
-                (motionTouchEventY - currentY) / 2
+                (motionTouchEventX + currentX) / 2,
+                (motionTouchEventY + currentY) / 2
             )
             restartCurrentXY()
             extraCanvas.drawPath(path, paint)
@@ -115,15 +117,15 @@ class DrawView @JvmOverloads constructor(
         invalidate()
     }
 
-    private fun touchUp(){
+    private fun touchUp() {
         drawing.addPath(curPath)
         curPath.reset()
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        if(::extraBitmap.isInitialized) extraBitmap.recycle()
-        extraBitmap = Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888)
+    override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight)
+        if (::extraBitmap.isInitialized) extraBitmap.recycle()
+        extraBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         extraCanvas = Canvas(extraBitmap)
     }
 

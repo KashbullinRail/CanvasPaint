@@ -3,21 +3,22 @@ package com.example.canvaspaint
 data class ViewState(
     val toolsList: List<ToolItem.ToolModel>,
     val colorList: List<ToolItem.ColorModel>,
-    val sizeList: List<ToolItem.SizeModel>,
+//    val sizeList: List<ToolItem.SizeModel>,
     val canvasViewState: CanvasViewState,
     val isPaletteVisible: Boolean,
-    val isBrushSizeChangerVisible: Boolean,
+//    val isBrushSizeChangerVisible: Boolean,
     val isToolsVisible: Boolean
 )
 
+sealed class UiEvent : Event {
+    data class OnPaletteClicked(val index: Int) : UiEvent()
+    data class OnColorClick(val index: Int) : UiEvent()
+    data class OnSizeClick(val index: Int) : UiEvent()
+    data class OnToolsClick(val index: Int) : UiEvent()
+    object OnDrawViewClicked : UiEvent()
+    object OnToolbarClicked : UiEvent()
+}
 
-
-sealed class UIEvent: Event {
-    data class OnPaletteClicked(val index: Int): UIEvent()
-    data class OnColorClicked(val index: Int): UIEvent()
-    data class OnSizeClicked(val index: Int): UIEvent()
-    data class OnToolsClicked(val index: Int): UIEvent()
-    object OnDrawViewClicked: UIEvent()
-    object OnToolbarClicked: UIEvent()
-
+sealed class DataEvent : Event {
+    data class OnSetDefaultTools(val tool: TOOLS, val color: COLOR) : DataEvent()
 }
